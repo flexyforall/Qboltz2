@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="162" height="28" viewBox="0 0 162 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="brackets" opacity="0.4">
+<path id="Vector" d="M6.5 27.5L2.5 27.5C1.39543 27.5 0.5 26.6046 0.5 25.5L0.5 21.5" stroke="white"/>
+<path id="Vector_2" d="M161.5 21.5L161.5 25.5C161.5 26.6046 160.605 27.5 159.5 27.5L155.5 27.5" stroke="white"/>
+<path id="Vector_3" d="M155.5 0.5L159.5 0.5C160.605 0.5 161.5 1.39543 161.5 2.5L161.5 6.5" stroke="white"/>
+<path id="Vector_4" d="M0.5 6.5V2.5C0.5 1.39543 1.39543 0.5 2.5 0.5H6.5" stroke="white"/>
+</g>
+</svg>

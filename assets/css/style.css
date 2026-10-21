@@ -1,0 +1,597 @@
+/* Qboltz — Concept UI (Figma 713:6687)
+   Every value below is a Figma design pixel. Artboards are 1440×820:
+   .board   is contain-scaled by --k (content keeps the Figma proportions),
+   .bgboard is cover-scaled by --K (backgrounds always bleed to the edges). */
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/GeistMono-Medium-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --k: 1;
+  --K: 1;
+
+  --f-display: "Clash Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --c-white: #fff;
+  --c-black: #000;
+  --c-header: #24242d;
+  --c-blue: #444fff;
+  --c-deep: #080e17;
+  --c-navy: #172050;
+  --c-mist: #d6d7e6;
+  --glow: 0 0 12px rgba(168, 217, 255, 0.55);
+  --fade: linear-gradient(180deg, rgba(8, 9, 23, 0) 0%, var(--c-deep) 100%);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { background: var(--c-black); }
+
+body {
+  margin: 0;
+  background: var(--c-black);
+  color: var(--c-white);
+  font-family: var(--f-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+img { display: block; max-width: none; }
+p, h1, h2 { margin: 0; font-weight: 400; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+
+/* ---------- artboards ---------- */
+
+.board,
+.bgboard {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1440px;
+  height: 820px;
+}
+.board { transform: translate(-50%, -50%) scale(var(--k)); }
+.bgboard { transform: translate(-50%, -50%) scale(var(--K)); isolation: isolate; }
+.bgboard--black { background: var(--c-black); }
+
+.scene__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--c-black);
+}
+
+/* ---------- type ---------- */
+
+.glow-text { text-shadow: var(--glow); }
+
+.display-56 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 56px;
+  line-height: 1.1;
+  color: var(--c-white);
+}
+
+.mono-12 {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-white);
+}
+
+/* ---------- shared bits ---------- */
+
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--c-white);
+}
+.dot--glow { box-shadow: 0 0 6px 0 rgba(255, 255, 255, 0.8); }
+
+.corner { position: absolute; width: 8px; height: 8px; }
+.corner--tl { left: 0; top: 0; }
+.corner--tr { right: 0; top: 0; }
+.corner--bl { left: 0; bottom: 0; }
+.corner--br { right: 0; bottom: 0; }
+
+/* Menu / Item with brackets */
+.tag {
+  position: absolute;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+.tag__dot { flex: none; width: 6px; height: 6px; border-radius: 1px; background: var(--c-blue); }
+.tag__label {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+.tag__brackets { position: absolute; left: -0.5px; top: -0.5px; height: 28px; }
+
+/* Button / Aperture */
+.btn-aperture {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 6px;
+}
+.btn-aperture__body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  padding: 0 24px 0 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+  transition: background-color 0.3s ease;
+}
+.btn-aperture__label {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: 3.68px;
+  white-space: nowrap;
+}
+.btn-aperture:hover .btn-aperture__body { background: rgba(255, 255, 255, 0.18); }
+
+/* Hover: letters dip one after another, left to right (Wedge reference) */
+[data-hover-text] .ch { display: inline; }
+[data-hover-text].is-flicker .ch {
+  animation: letter-dip 0.42s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 32ms);
+}
+@keyframes letter-dip {
+  0% { opacity: 1; }
+  32% { opacity: 0.12; }
+  100% { opacity: 1; }
+}
+
+/* ---------- header (702:5445) ---------- */
+
+.header {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  top: calc(20px * var(--k));
+  transform: translateX(-50%) scale(var(--k));
+  transform-origin: 50% 0;
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  padding: 8px 8px 8px 24px;
+  background: var(--c-header);
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+body[data-scene="0"] .header { opacity: 0; visibility: hidden; }
+
+.header__logo { display: flex; flex-direction: column; justify-content: center; height: 32px; }
+.header__logo-box { position: relative; display: block; width: 136px; height: 16px; overflow: hidden; }
+.header__logo-box img { position: absolute; left: 1.6048px; top: 1.6px; width: 132.69px; height: 12.9px; }
+
+.header__nav { display: flex; align-items: center; justify-content: center; gap: 24px; }
+
+.menu-item { display: flex; align-items: center; gap: 12px; }
+.menu-item__label,
+.btn-framed__label {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 1.44px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.menu-item__label { color: rgba(255, 255, 255, 0.85); }
+
+.btn-framed {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 8px 16px;
+  border-radius: 2px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- bottom line (702:5440) ---------- */
+
+.bottom {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.bottom p {
+  padding: 40px;
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-white);
+  opacity: 0.6;
+}
+.bottom__left { transform: scale(var(--k)); transform-origin: 0 100%; }
+.bottom__right { transform: scale(var(--k)); transform-origin: 100% 100%; }
+.bottom--dark p { color: var(--c-black); }
+
+/* ============ INTRO: frames 1–5 ============ */
+
+.intro {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--c-black);
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+.scene.is-active { visibility: visible; }
+
+.intro__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--c-black);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro__bottom { transition: opacity 0.6s ease; }
+body[data-scene="0"] .intro__bottom { opacity: 0; }
+
+/* bottom gradient + blur rectangles */
+.fade {
+  position: absolute;
+  left: 0;
+  width: 1440px;
+  background: var(--fade);
+}
+.fade--f2 { top: 489px; height: 331px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.fade--f3 { top: 639px; height: 181px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.fade--f4 { top: 367px; height: 453px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.fade--f5 { top: 639px; height: 181px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+/* The same 2880×2450 render, cropped and rotated differently in frames 2 and 3.
+   Matrices are the inverse of each fill's Figma imageTransform. */
+.swoosh {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2880px;
+  height: 2450px;
+  transform-origin: 0 0;
+}
+.swoosh--f2 { transform: matrix(0.525992, 0.317312, -0.317321, 0.526007, 384.2254, -675.9002); }
+.swoosh--f3 { transform: matrix(0.198051, 0.661617, -0.661636, 0.198056, 1299.6624, -826.9218); }
+
+/* Frame 1 */
+.scene__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.f1-logo { position: absolute; left: 301px; top: 373.0007px; width: 838px; height: 74.1186px; }
+
+/* Frame 2 */
+.f2-content {
+  position: absolute;
+  left: 355px;
+  top: 562px;
+  width: 730px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+.f2-title {
+  width: 100%;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: -1.44px;
+  text-align: center;
+}
+
+/* Frame 3 */
+.topfade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1440px;
+  height: 112px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, var(--c-black) 152.57%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.f3-text { position: absolute; left: 148px; top: 476px; width: 644px; transform: translateY(-50%); }
+.tag--f3-light { left: 940px; top: 655px; width: 161px; }
+
+/* Frame 4 */
+.fan {
+  position: absolute;
+  left: -592px;
+  top: -224px;
+  width: 1342px;
+  height: 1315px;
+  object-fit: fill;
+  mix-blend-mode: screen;
+}
+.f4-text { position: absolute; left: 749px; top: 602px; width: 562px; transform: translateY(-50%); }
+.tag--f4-problem { left: 192px; top: 509px; width: 125px; }
+
+.lock { position: absolute; inset: 0; pointer-events: none; }
+.lock__plan { position: absolute; left: 738.548px; top: 337px; width: 72px; height: 72px; }
+.lock__corner { position: absolute; width: 10px; height: 10px; }
+.lock__corner--tl { left: 752.548px; top: 351px; }
+.lock__corner--tr { left: 786.548px; top: 351px; }
+.lock__corner--bl { left: 752.548px; top: 385px; }
+.lock__corner--br { left: 786.548px; top: 385px; }
+.lock__label { position: absolute; left: 810.548px; top: 366px; }
+
+/* Frame 5 */
+.spiral {
+  position: absolute;
+  left: -210px;
+  top: -14.306px;
+  width: 1546px;
+  height: 853.597px;
+  object-fit: cover;
+  mix-blend-mode: hard-light;
+  opacity: 0.4;
+}
+.f5-content {
+  position: absolute;
+  left: 791px;
+  top: 417px;
+  width: 503px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.f5-title { width: 562px; }
+.f5-text { font-family: var(--f-display); font-weight: 400; font-size: 20px; line-height: 1.5; opacity: 0.6; }
+.tag--f5-light { left: 610px; top: 174px; width: 161px; }
+.tag--f5-problem { left: 53px; top: 477px; width: 125px; }
+.tag--f5-cut { left: 519px; top: 680px; width: 118px; }
+
+.core {
+  position: absolute;
+  left: 343.9995px;
+  top: 330.9995px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.core__orb { position: relative; width: 89.0005px; height: 89.0005px; flex: none; }
+.core__halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* Figma: #fff 20%, #c4bcff 60%, #a69aff 80%, #8878ff 100% in Hard light over black.
+     The board is an isolated group, so the blend is baked into the stops: c → 2c − 1 */
+  background: radial-gradient(circle closest-side, #fff 20%, #8979ff 60%, #4d35ff 80%, #1100ff 100%);
+  filter: blur(10.19px);
+}
+.core__inner { position: absolute; left: 23.37px; top: 23.37px; width: 42.257px; height: 42.257px; mix-blend-mode: plus-lighter; }
+.core__ring {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, #fff 80.769%, #ffcbca 85.577%, #ff9794 90.385%, #fe7d79 92.788%, #fe635f 95.192%, #fe4944 97.596%, #fe2f29 100%);
+  filter: blur(2.332px);
+}
+.core__ring--a { left: 2.92px; top: 2.91px; width: 36.429px; height: 36.429px; }
+.core__ring--b { left: 0; top: 0; width: 42.257px; height: 42.257px; mix-blend-mode: screen; }
+
+/* ============ FEATURES: frames 6–8 ============ */
+
+.features {
+  position: relative;
+  height: 340vh;
+}
+
+.features__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--c-black);
+}
+
+.bgboard--features {
+  background: linear-gradient(180deg, var(--c-black) 37.605%, var(--c-navy) 82.957%, var(--c-mist) 165.91%);
+}
+
+/* Vector 60: blurred light under the cards; it sits above them in Figma */
+.wave-layer { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.wave {
+  position: absolute;
+  left: -302.0025px;
+  top: 632.003px;
+  width: 1809.785px;
+  height: 405.707px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wave__skew {
+  position: relative;
+  flex: none;
+  width: 1808.862px;
+  height: 383.412px;
+  transform: rotate(-0.71deg) skewX(-0.86deg);
+}
+.wave__skew img { position: absolute; left: -160.264px; top: -159.998px; width: 2129.24px; height: 703.401px; }
+
+/* Figma Noise effect on the frame: mono, #000 at 25%, size 0.5 */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  background: url("../images/noise.png") repeat;
+}
+
+.features__stage > .board { z-index: 2; }
+.features__stage > .board--top { z-index: 5; pointer-events: none; }
+.features__stage > .bottom { z-index: 6; }
+
+.f6-left {
+  position: absolute;
+  left: 0;
+  top: 299px;
+  width: 670px;
+  height: 387px;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.f6-title { width: 515px; }
+
+.progress {
+  position: absolute;
+  left: 642px;
+  top: 684px;
+  width: 199.5px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--c-white);
+}
+
+.f6-right {
+  position: absolute;
+  left: 642px;
+  top: 299px;
+  width: 798px;
+  height: 387px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.track {
+  position: relative;
+  flex: none;
+  width: 1198px;
+  height: 296px;
+  overflow: hidden;
+}
+.track__corners { position: absolute; z-index: 2; left: 0; top: -1px; width: 305px; height: 202px; pointer-events: none; }
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 304px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  will-change: transform, opacity;
+}
+.card__box { display: flex; width: 304px; height: 200px; padding: 12px; }
+.card__body {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px 0 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, var(--card-line, 0.16));
+  background: rgba(255, 255, 255, var(--card-fill, 0));
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+}
+.card__title {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+.card__desc { display: flex; width: 100%; padding: 0 12px; }
+.card__desc span {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+.badge { display: flex; flex-direction: column; align-items: flex-start; padding: 0 12px; }
+.badge__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 27px;
+  padding: 0 16px;
+  border-radius: 2px;
+  background: var(--c-blue);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.tag--f6-cryo { left: 926px; top: 162px; width: 132px; }
+.tag--f6-mature { left: 217px; top: 609px; width: 161px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hover-text].is-flicker .ch { animation: none; }
+}
