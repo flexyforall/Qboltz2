@@ -1,6 +1,6 @@
 /* Qboltz — Concept UI (Figma 713:6687)
-   1. Frames 1–5 share one screen. Each scroll step fades to black, swaps the frame
-      and fades back in. Frame 1 plays the intro video once and holds its last frame.
+   1. Frames 1–5 share one screen. Each scroll step crossfades to the next frame.
+      Frame 1 plays the intro video once and holds its last frame.
    2. After frame 5 the page scrolls normally. Frames 6–8 are three states of one
       sticky section: the cards slide with the scroll position.
    3. Every button gets the letter-by-letter hover from the Wedge reference. */
@@ -67,22 +67,21 @@
     }
   });
 
-  /* ---------- intro: frames 1–5 through black ---------- */
+  /* ---------- intro: frames 1–5 crossfade ---------- */
 
   var intro = document.querySelector(".intro");
   var scenes = Array.prototype.slice.call(intro.querySelectorAll(".scene"));
-  var veil = intro.querySelector(".intro__veil");
   var video = intro.querySelector(".scene__video");
   var LAST = scenes.length - 1;
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var OUT_MS = reduced ? 1 : 450;
-  var IN_MS = reduced ? 1 : 650;
+  var FADE_MS = reduced ? 1 : 900;
 
   var current = 0;
   var busy = false;
 
-  function setScene(n) {
-    scenes.forEach(function (s, i) { s.classList.toggle("is-active", i === n); });
+  // `keep` stays visible under the incoming frame until the crossfade ends
+  function setScene(n, keep) {
+    scenes.forEach(function (s, i) { s.classList.toggle("is-active", i === n || s === keep); });
     current = n;
     body.setAttribute("data-scene", String(n));
     if (n === 0 && video) {
@@ -92,23 +91,34 @@
     }
   }
 
-  function veilTo(from, to, ms, easing) {
+  // Resolves with the animation, held at its end state until the caller cancels it
+  function fade(el, keyframes, ms, easing) {
     return new Promise(function (resolve) {
-      if (!veil.animate) { veil.style.opacity = to; resolve(); return; }
-      var a = veil.animate([{ opacity: from }, { opacity: to }], { duration: ms, easing: easing, fill: "forwards" });
-      a.onfinish = resolve;
+      if (!el.animate) { resolve(null); return; }
+      var a = el.animate(keyframes, { duration: ms, easing: easing, fill: "forwards" });
+      a.onfinish = function () { resolve(a); };
     });
   }
 
+  // Backgrounds crossfade over the whole transition. The old text is gone in the
+  // first 40% and the new text starts at 35%, so headlines barely overlap.
   function go(n) {
     if (busy || n === current || n < 0 || n > LAST) return Promise.resolve();
     busy = true;
-    return veilTo(0, 1, OUT_MS, "cubic-bezier(0.4, 0, 1, 1)")
-      .then(function () {
-        setScene(n);
-        return veilTo(1, 0, IN_MS, "cubic-bezier(0, 0, 0.2, 1)");
-      })
-      .then(function () { busy = false; });
+    var from = scenes[current];
+    var to = scenes[n];
+    to.classList.add("is-entering");
+    setScene(n, from);
+    return Promise.all([
+      fade(to, [{ opacity: 0 }, { opacity: 1 }], FADE_MS, "cubic-bezier(0.4, 0, 0.2, 1)"),
+      fade(to.querySelector(".board"), [{ opacity: 0 }, { opacity: 0, offset: 0.35 }, { opacity: 1 }], FADE_MS, "ease-out"),
+      fade(from.querySelector(".board"), [{ opacity: 1 }, { opacity: 0 }], FADE_MS * 0.4, "cubic-bezier(0, 0, 0.2, 1)")
+    ]).then(function (anims) {
+      from.classList.remove("is-active");
+      to.classList.remove("is-entering");
+      anims.forEach(function (a) { if (a) a.cancel(); });
+      busy = false;
+    });
   }
 
   function atTop() { return window.scrollY <= 2; }
@@ -286,14 +296,13 @@
       e.preventDefault();
       if (/^\d+$/.test(to)) {
         var n = +to;
-        if (atTop()) { go(n); return; }
-        // jump back to the top behind the veil, then land on the frame
-        busy = true;
-        veilTo(0, 1, OUT_MS, "ease-in").then(function () {
+        // from further down: back to the top on frame 5, then crossfade to the target
+        if (!atTop()) {
+          if (busy) return;
           window.scrollTo(0, 0);
-          setScene(n);
-          return veilTo(1, 0, IN_MS, "ease-out");
-        }).then(function () { busy = false; });
+          setScene(LAST);
+        }
+        go(n);
         return;
       }
       if (current !== LAST && atTop()) setScene(LAST);

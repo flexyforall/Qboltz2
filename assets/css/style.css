@@ -268,15 +268,7 @@ body[data-scene="0"] .header { opacity: 0; visibility: hidden; }
   visibility: hidden;
 }
 .scene.is-active { visibility: visible; }
-
-.intro__veil {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  background: var(--c-black);
-  opacity: 0;
-  pointer-events: none;
-}
+.scene.is-entering { z-index: 2; }
 
 .intro__bottom { transition: opacity 0.6s ease; }
 body[data-scene="0"] .intro__bottom { opacity: 0; }
